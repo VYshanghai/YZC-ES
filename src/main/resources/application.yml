@@ -1,0 +1,10 @@
+server:
+  port: 9999
+
+spring:
+  application:
+    name: yzc-es
+es:
+  host: localhost:9200
+  username:
+  password:
