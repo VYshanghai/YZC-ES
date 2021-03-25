@@ -1,14 +1,9 @@
-package com.vy.yzc.es.dal.repo.model;
+package com.vy.yzc.es.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.springframework.data.elasticsearch.annotations.GeoPointField;
 
 /**
  * @author: vikko
@@ -16,21 +11,15 @@ import org.springframework.data.elasticsearch.annotations.GeoPointField;
  * @Description:
  */
 @Data
-@Document(indexName = "visva-yzc-beta", type = "offers")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EsOffersPO {
+public class EsOffersSaveReq {
 
-	private String score;
-
-	@Id
 	private Long offersId;
 
-	@Field(type = FieldType.Text, analyzer = "ik_max_word")
 	private String title;
 
-	@Field(type = FieldType.Text, analyzer = "ik_max_word")
 	private String content;
 
 	/**
@@ -51,13 +40,11 @@ public class EsOffersPO {
 	/**
 	 * 分类名称
 	 */
-	@Field(type = FieldType.Text, analyzer = "ik_max_word")
 	private String categoryName;
 
 	/**
 	 * 店名
 	 */
-	@Field(type = FieldType.Text, analyzer = "ik_max_word")
 	private String shopName;
 
 	/**
@@ -65,7 +52,6 @@ public class EsOffersPO {
 	 * 例如：31.231706,121.472644
 	 * 英文逗号
 	 */
-	@GeoPointField
 	private String location;
 
 	/**
@@ -98,6 +84,9 @@ public class EsOffersPO {
 	 */
 	private Integer deleted;
 
+	/**
+	 * 信息来源平台：0 未知 1 羊值厂 2 淘宝 3 京东 4 拼多多 5 唯品会 6 美团 7 其它。默认 0
+	 */
 	private Integer platform;
 
 }
