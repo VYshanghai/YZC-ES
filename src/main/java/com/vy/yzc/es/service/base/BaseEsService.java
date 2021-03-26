@@ -1,5 +1,6 @@
 package com.vy.yzc.es.service.base;
 
+import com.vy.yzc.es.eo.BaseEsPageReq;
 import java.util.List;
 import java.util.function.Function;
 import org.elasticsearch.index.query.QueryBuilder;

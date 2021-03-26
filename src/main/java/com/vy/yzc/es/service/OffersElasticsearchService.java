@@ -10,7 +10,6 @@ import com.vy.yzc.es.dto.OffersNearReq;
 import com.vy.yzc.es.dto.OffersSearchReq;
 import com.vy.yzc.es.service.base.BaseEsService;
 import java.util.List;
-import org.springframework.data.domain.Page;
 
 /**
  * @author: vikko

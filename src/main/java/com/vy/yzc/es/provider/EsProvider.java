@@ -96,4 +96,5 @@ public class EsProvider {
 	public Boolean saveReqs(@RequestBody List<EsOffersSaveReq> reqs){
 		return offersElasticsearchService.saveReqs(reqs);
 	}
+
 }

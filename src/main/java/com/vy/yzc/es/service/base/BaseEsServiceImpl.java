@@ -1,5 +1,6 @@
 package com.vy.yzc.es.service.base;
 
+import com.vy.yzc.es.eo.BaseEsPageReq;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;

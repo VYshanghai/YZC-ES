@@ -98,6 +98,13 @@
       <artifactId>jackson-dataformat-yaml</artifactId>
       <version>${jackson-dataformat-yaml.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.vy</groupId>
+      <artifactId>es-core-api</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+
   </dependencies>
 
 </project>
