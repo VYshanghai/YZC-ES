@@ -2,6 +2,7 @@ package com.vy.yzc.es;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 /**
@@ -9,6 +10,7 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
  * @Date: 2021/3/26 00:18
  * @Description:
  */
+@EnableEurekaClient
 @SpringBootApplication
 @EnableElasticsearchRepositories
 public class EsBootstrap {
