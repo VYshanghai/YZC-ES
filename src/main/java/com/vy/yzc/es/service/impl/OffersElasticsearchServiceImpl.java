@@ -79,7 +79,7 @@ public class OffersElasticsearchServiceImpl extends
 	}
 
 	@Override
-	public EsSearchVO<Long> searchFilter(OffersFilterReq req, Long userId) {
+	public EsSearchVO<Long> searchFilter(OffersFilterReq req) {
 		Page<Long> page = page(req,
 				q -> getFilterQuery(req),
 				getFilterSortBuilder(req.getLat(), req.getLng(), req.getPostType()),
@@ -93,7 +93,7 @@ public class OffersElasticsearchServiceImpl extends
 	}
 
 	@Override
-	public EsSearchVO<Long> searchKeyword(OffersSearchReq req, Long userId) {
+	public EsSearchVO<Long> searchKeyword(OffersSearchReq req) {
 		OffersSearchType offersSearchType = Optional
 				.ofNullable(OffersSearchType.getByCode(req.getType()))
 				.orElseThrow(() -> new RuntimeException("未知的枚举"));
@@ -108,7 +108,7 @@ public class OffersElasticsearchServiceImpl extends
 	}
 
 	@Override
-	public EsSearchVO<Long> near(OffersNearReq req, Long userId) {
+	public EsSearchVO<Long> near(OffersNearReq req) {
 
 		if (Objects.isNull(req.getLat()) || Objects.isNull(req.getLng())) {
 			//todo throw new

@@ -28,18 +28,16 @@ public interface OffersElasticsearchService extends BaseEsService<EsOffersPO, Of
 	/**
 	 * 根据关键词分页搜索
 	 * @param req
-	 * @param userId
 	 * @return
 	 */
-	EsSearchVO<Long> searchKeyword(OffersSearchReq req, Long userId);
+	EsSearchVO<Long> searchKeyword(OffersSearchReq req);
 
 	/**
 	 * 根据条件过滤筛选
 	 * @param req
-	 * @param userId
 	 * @return
 	 */
-	EsSearchVO<Long> searchFilter(OffersFilterReq req, Long userId);
+	EsSearchVO<Long> searchFilter(OffersFilterReq req);
 
 
 	/**
@@ -60,10 +58,9 @@ public interface OffersElasticsearchService extends BaseEsService<EsOffersPO, Of
 	/**
 	 * 附近的爆料
 	 * @param req
-	 * @param userId
 	 * @return
 	 */
-	EsSearchVO<Long> near(OffersNearReq req, Long userId);
+	EsSearchVO<Long> near(OffersNearReq req);
 
 	/**
 	 * 更新deleted状态

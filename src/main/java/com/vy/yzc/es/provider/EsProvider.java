@@ -42,17 +42,17 @@ public class EsProvider {
 	/**
 	 * 根据关键词分页搜索
 	 */
-	@PostMapping("/search/keyword/{userId}")
-	public EsSearchVO<Long> searchKeyword(@RequestBody OffersSearchReq req, @PathVariable(required = false)Long userId){
-		return offersElasticsearchService.searchKeyword(req,userId);
+	@PostMapping("/search/keyword")
+	public EsSearchVO<Long> searchKeyword(@RequestBody OffersSearchReq req){
+		return offersElasticsearchService.searchKeyword(req);
 	}
 
 	/**
 	 * 根据条件过滤筛选
 	 */
-	@PostMapping("/search/filter/{userId}")
-	public EsSearchVO<Long> searchFilter(@RequestBody OffersFilterReq req, @PathVariable(required = false) Long userId){
-		return offersElasticsearchService.searchFilter(req,userId);
+	@PostMapping("/search/filter")
+	public EsSearchVO<Long> searchFilter(@RequestBody OffersFilterReq req){
+		return offersElasticsearchService.searchFilter(req);
 	}
 
 
@@ -76,15 +76,15 @@ public class EsProvider {
 	/**
 	 * 附近的爆料
 	 */
-	@PostMapping("/near/{userId}")
-	public EsSearchVO<Long> near(@RequestBody OffersNearReq req, @PathVariable(required = false) Long userId){
-		return offersElasticsearchService.near(req, userId);
+	@PostMapping("/near")
+	public EsSearchVO<Long> near(@RequestBody OffersNearReq req){
+		return offersElasticsearchService.near(req);
 	}
 
 	/**
 	 * 更新deleted状态
 	 */
-	@PostMapping("/update/deleted/state")
+	@PostMapping("/update/deleted/state/{deleted}")
 	public Boolean updateDeletedState(@RequestBody List<Long> offersIds, @PathVariable(required = false) Integer deleted){
 		return offersElasticsearchService.updateDeletedState(offersIds,deleted);
 	}
