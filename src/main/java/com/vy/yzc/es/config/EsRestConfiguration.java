@@ -1,3 +1,4 @@
+/*
 package com.vy.yzc.es.config;
 
 import com.vy.yzc.es.properties.EsProperties;
@@ -16,11 +17,13 @@ import org.springframework.data.elasticsearch.client.RestClients;
 import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
 import org.springframework.http.HttpHeaders;
 
+*/
 /**
  * @Author: Edward
  * @Date: 2021/3/26 00:22
  * @Description:
- */
+ *//*
+
 @Configuration
 public class EsRestConfiguration extends AbstractElasticsearchConfiguration {
 
@@ -49,3 +52,4 @@ public class EsRestConfiguration extends AbstractElasticsearchConfiguration {
 	}
 
 }
+*/
