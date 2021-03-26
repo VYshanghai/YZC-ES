@@ -8,3 +8,6 @@ es:
   host: localhost:9200
   username:
   password:
+
+logging:
+  config: classpath:log4j2.yml
