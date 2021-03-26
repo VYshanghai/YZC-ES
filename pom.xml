@@ -22,6 +22,13 @@
     <knife4j.version>2.0.4</knife4j.version>
     <jackson-databind.version>2.9.9</jackson-databind.version>
     <jackson-dataformat-yaml.version>2.9.9</jackson-dataformat-yaml.version>
+
+    <!-- docker -->
+    <docker.repository>registry-vpc.cn-beijing.aliyuncs.com</docker.repository>
+    <docker.registry.name>visva</docker.registry.name>
+    <docker-maven-plugin.version>1.1.1</docker-maven-plugin.version>
+    <!-- git -->
+    <git-commit-id-plugin.version>2.2.1</git-commit-id-plugin.version>
   </properties>
 
   <dependencies>
@@ -65,7 +72,7 @@
       <optional>true</optional>
     </dependency>
 
-    <dependency>
+<!--    <dependency>
       <groupId>io.springfox</groupId>
       <artifactId>springfox-swagger2</artifactId>
       <version>${io.springfox.swagger}</version>
@@ -74,7 +81,7 @@
       <groupId>io.springfox</groupId>
       <artifactId>springfox-swagger-ui</artifactId>
       <version>${io.springfox.swagger}</version>
-    </dependency>
+    </dependency>-->
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -113,10 +120,10 @@
 
 
     <!-- 增强版swagger-ui -->
-    <dependency>
+    <!--<dependency>
       <groupId>com.github.xiaoymin</groupId>
       <artifactId>knife4j-micro-spring-boot-starter</artifactId>
-    </dependency>
+    </dependency>-->
 
     <!-- actuator -->
     <dependency>
@@ -148,4 +155,116 @@
     </dependencies>
   </dependencyManagement>
 
+
+  <distributionManagement>
+    <repository>
+      <id>nexus-releases</id>
+      <url>https://nexus.visvachina.com/repository/maven-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>nexus-snapshots</id>
+      <url>https://nexus.visvachina.com/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.8.2</version>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>${git-commit-id-plugin.version}</version>
+        <configuration>
+          <!-- human-readable part of the version number -->
+          <dateFormat>yyyyMMdd</dateFormat>
+          <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+          <!--somehow necessary. otherwise the variables are not available in the pom -->
+          <generateGitPropertiesFile>false</generateGitPropertiesFile>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>${docker-maven-plugin.version}</version>
+        <configuration>
+          <imageName>${docker.repository}/${docker.registry.name}/${project.artifactId}</imageName>
+          <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+          <resources>
+            <resource>
+              <targetPath>/</targetPath>
+              <directory>${project.build.directory}</directory>
+              <include>${project.build.finalName}.jar</include>
+            </resource>
+          </resources>
+          <serverId>aliyuncs.visva.io</serverId>
+          <registryUrl>${docker.repository}</registryUrl>
+          <imageTags>
+            <imageTage>${git.commit.time}-${git.commit.id.abbrev}</imageTage>
+          </imageTags>
+        </configuration>
+        <executions>
+          <execution>
+            <id>build-image</id>
+            <phase>package</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>tag-image</id>
+            <phase>package</phase>
+            <goals>
+              <goal>tag</goal>
+            </goals>
+            <configuration>
+              <image>${docker.repository}/${docker.registry.name}/${project.artifactId}</image>
+              <newName>
+                ${docker.repository}/${docker.registry.name}/${project.artifactId}:${git.commit.time}-${git.commit.id.abbrev}
+              </newName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>push-image</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>push</goal>
+            </goals>
+            <configuration>
+              <imageName>
+                ${docker.repository}/${docker.registry.name}/${project.artifactId}:${git.commit.time}-${git.commit.id.abbrev}
+              </imageName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>${java.version}</source>
+            <target>${java.version}</target>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

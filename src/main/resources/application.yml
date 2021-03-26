@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: yzc-es
+    name: yzc-es-core
   main:
     allow-bean-definition-overriding: true
   jackson:
