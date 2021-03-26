@@ -283,6 +283,9 @@ public class OffersElasticsearchServiceImpl extends
 
 	@Override
 	public Boolean saveReqs(List<EsOffersSaveReq> reqs) {
+		if(CollectionUtils.isEmpty(reqs)){
+			return false;
+		}
 		List<EsOffersPO> list = reqs.stream().map(source -> {
 			EsOffersPO saveEntity = new EsOffersPO();
 			defaultCopy(source, saveEntity);
