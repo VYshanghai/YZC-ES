@@ -98,6 +98,14 @@ public class EsOffersPO {
 	 */
 	private Integer deleted;
 
+	/**
+	 * 信息来源平台：0 未知 1 羊值厂 2 淘宝 3 京东 4 拼多多 5 唯品会 6 美团 7 其它。默认 0
+	 */
 	private Integer platform;
+
+	/**
+	 * cityName
+	 */
+	private String cityName;
 
 }
