@@ -277,6 +277,9 @@ public class OffersElasticsearchServiceImpl extends
 
 	@Override
 	public Boolean saveReqs(List<EsOffersSaveReq> reqs) {
+		if(CollectionUtils.isEmpty(reqs)){
+			return false;
+		}
 		CompletableFuture.runAsync(() -> {
 			List<EsOffersPO> list = reqs.stream().map(source -> {
 				EsOffersPO saveEntity = new EsOffersPO();

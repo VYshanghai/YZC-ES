@@ -25,4 +25,8 @@ public class EsProperties {
 	private String username;
 
 	private String password;
+
+	private Integer connectTimeout;
+
+	private Integer socketTimeout;
 }

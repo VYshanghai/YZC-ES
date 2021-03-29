@@ -8,6 +8,13 @@ spring:
     allow-bean-definition-overriding: true
   jackson:
     default-property-inclusion: NON_NULL
+  elasticsearch:
+    rest:
+      uris: ${es.host}
+      username: ${es.username}
+      password: ${es.password}
+      connection-timeout: 10000
+      read-timeout: 30000
 es:
   host: localhost:9200
   username:
