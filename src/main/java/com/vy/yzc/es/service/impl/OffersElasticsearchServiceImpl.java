@@ -218,7 +218,7 @@ public class OffersElasticsearchServiceImpl extends
 
 	public QueryBuilder getNearQuery() {
 		BoolQueryBuilder result = getCommonBuilder();
-		result.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getPostType), 1));
+		result.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getPostType), 2));
 		return result;
 	}
 
