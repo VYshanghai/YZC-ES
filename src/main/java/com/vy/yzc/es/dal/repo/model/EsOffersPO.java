@@ -22,7 +22,7 @@ import org.springframework.data.elasticsearch.annotations.GeoPointField;
 @NoArgsConstructor
 public class EsOffersPO {
 
-	private String score;
+//	private String score;
 
 	@Id
 	private Long offersId;
