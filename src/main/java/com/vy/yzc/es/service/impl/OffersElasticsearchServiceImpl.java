@@ -69,12 +69,12 @@ public class OffersElasticsearchServiceImpl extends
 		return page2VO(page);
 	}
 
-	private <T> EsSearchVO<T> page2VO(Page<T> source){
+	private <T> EsSearchVO<T> page2VO(Page<T> source) {
 		return EsSearchVO.<T>builder()
 				.currentPage(source.getNumber() + 1)
 				.pageSize(source.getSize())
 				.results(source.getContent())
-				.total((int)source.getTotalElements())
+				.total((int) source.getTotalElements())
 				.build();
 	}
 
@@ -83,12 +83,10 @@ public class OffersElasticsearchServiceImpl extends
 		Page<Long> page = page(req,
 				q -> getFilterQuery(req),
 				getFilterSortBuilder(req.getLat(), req.getLng(), req.getPostType()),
-				pos -> {
-					return pos.stream()
-							.sorted(Comparator.comparing(EsOffersPO::getCreatedTime).reversed())
-							.map(EsOffersPO::getOffersId)
-							.collect(Collectors.toList());
-				});
+				pos -> pos.stream()
+						.sorted(Comparator.comparing(EsOffersPO::getCreatedTime).reversed())
+						.map(EsOffersPO::getOffersId)
+						.collect(Collectors.toList()));
 		return page2VO(page);
 	}
 
@@ -101,9 +99,7 @@ public class OffersElasticsearchServiceImpl extends
 		Page<Long> page = page(req,
 				q -> getKeywordBuilder(offersSearchType, q.getKeyword()),
 				getScoreSortBuilder(),
-				pos -> {
-					return pos.stream().map(EsOffersPO::getOffersId).collect(Collectors.toList());
-				});
+				pos -> pos.stream().map(EsOffersPO::getOffersId).collect(Collectors.toList()));
 		return page2VO(page);
 	}
 
@@ -116,9 +112,7 @@ public class OffersElasticsearchServiceImpl extends
 		}
 		Page<Long> page = page(req, q -> getNearQuery(),
 				getFilterSortBuilder(req.getLat(), req.getLng(), 2),
-				pos -> {
-					return pos.stream().map(EsOffersPO::getOffersId).collect(Collectors.toList());
-				});
+				pos -> pos.stream().map(EsOffersPO::getOffersId).collect(Collectors.toList()));
 		return page2VO(page);
 	}
 
@@ -186,7 +180,7 @@ public class OffersElasticsearchServiceImpl extends
 	public BoolQueryBuilder getCommonBuilder() {
 		BoolQueryBuilder result = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getDeleted), 0));
-		result.must(getTimeValidStartQuery());
+//		result.must(getTimeValidStartQuery());
 		result.must(getTimeValidEndQuery());
 		return result;
 	}
@@ -283,19 +277,19 @@ public class OffersElasticsearchServiceImpl extends
 
 	@Override
 	public Boolean saveReqs(List<EsOffersSaveReq> reqs) {
-		List<EsOffersPO> list = reqs.stream().map(source -> {
-			EsOffersPO saveEntity = new EsOffersPO();
-			defaultCopy(source, saveEntity);
-			return saveEntity;
-		}).collect(Collectors.toList());
-		esOffersRepository.saveAll(list);
+		CompletableFuture.runAsync(() -> {
+			List<EsOffersPO> list = reqs.stream().map(source -> {
+				EsOffersPO saveEntity = new EsOffersPO();
+				defaultCopy(source, saveEntity);
+				return saveEntity;
+			}).collect(Collectors.toList());
+			esOffersRepository.saveAll(list);
+		}, esOffersSaveExecutor);
 		return true;
 	}
 
 	/**
 	 * todo
-	 * @param source
-	 * @param target
 	 */
 	public static void defaultCopy(Object source, Object target) {
 		BeanCopier beanCopier = BeanCopier.create(source.getClass(), target.getClass(), false);
