@@ -113,6 +113,7 @@ public class OffersElasticsearchServiceImpl extends
 		Page<Long> page = page(req, q -> getNearQuery(),
 				getFilterSortBuilder(req.getLat(), req.getLng(), 2),
 				pos -> pos.stream().map(EsOffersPO::getOffersId).collect(Collectors.toList()));
+		log.info("附近的爆料id ： 【{}】", page.getContent());
 		return page2VO(page);
 	}
 
