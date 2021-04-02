@@ -49,6 +49,11 @@ public class EsOffersPO {
 	private Long categoryType;
 
 	/**
+	 * 当前商品属性的所有id的string，用英文逗号隔开
+	 */
+	private String categoryIdList;
+
+	/**
 	 * 分类名称
 	 */
 	@Field(type = FieldType.Text, analyzer = "ik_max_word")

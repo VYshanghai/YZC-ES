@@ -6,15 +6,14 @@ import com.vy.yzc.es.dal.repo.model.EsOffersPO;
 import com.vy.yzc.es.dto.EsSearchVO;
 import com.vy.yzc.es.dto.OffersNearReq;
 import com.vy.yzc.es.service.OffersElasticsearchService;
-import java.math.BigDecimal;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.assertj.core.util.Lists;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetMappingsRequest;
@@ -26,8 +25,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -53,27 +50,27 @@ public class EsTestApplication {
 ////		System.out.println(offersRepository.findById(1375070232629309470L));
 //	}
 //
-//
-//	@Test
-//	public void delete(){
-//		offersRepository.deleteById(1234L);
-//	}
-//
-//	@Test
-//	public  void init(){
-//		EsOffersPO build = EsOffersPO.builder()
-//				.offersId(1234L)
-//				.title("title")
-//				.content("content")
-//				.infoSource(1)
-//				.postType(1)
-//				.categoryType(1L)
-//				.categoryName("name")
-//				.location("31.231706,121.472644")
-//				.deleted(1)
-//				.build();
-//		offersRepository.save(build);
-//	}
+
+	@Test
+	public void delete(){
+		offersRepository.deleteById(1234L);
+	}
+
+	@Test
+	public  void init(){
+		EsOffersPO build = EsOffersPO.builder()
+				.offersId(1234L)
+				.title("title")
+				.content("content")
+				.infoSource(1)
+				.postType(1)
+				.categoryType(1L)
+				.categoryName("name")
+				.location("31.231706,121.472644")
+				.deleted(1)
+				.build();
+		offersRepository.save(build);
+	}
 
 	/*@Autowired
 	private ElasticsearchTemplate elasticsearchTemplate;*/
@@ -83,8 +80,14 @@ public class EsTestApplication {
 
 	@Test
 	public void test(){
-		Iterable<EsOffersPO> all = offersRepository.findAll();
-		all.forEach(System.out::println);
+//		Iterable<EsOffersPO> all = offersRepository.findAll();
+//		all.forEach(System.out::println);
+		BoolQueryBuilder result = new BoolQueryBuilder();
+		//模糊查询
+		result.must(QueryBuilders.wildcardQuery("title", "*250g*"));
+		Iterable<EsOffersPO> search = offersRepository.search(result);
+		search.forEach(System.out::println);
+
 	}
 
 	@Autowired
