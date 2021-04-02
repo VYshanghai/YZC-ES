@@ -9,6 +9,7 @@ import com.vy.yzc.es.dto.OffersNearReq;
 import com.vy.yzc.es.dto.OffersSearchReq;
 import com.vy.yzc.es.service.OffersElasticsearchService;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,7 +52,7 @@ public class EsProvider {
 	 * 根据条件过滤筛选
 	 */
 	@PostMapping("/search/filter")
-	public EsSearchVO<Long> searchFilter(@RequestBody OffersFilterReq req){
+	public EsSearchVO<Long> searchFilter(@Valid @RequestBody OffersFilterReq req){
 		return offersElasticsearchService.searchFilter(req);
 	}
 

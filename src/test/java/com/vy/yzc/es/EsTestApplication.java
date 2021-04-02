@@ -138,4 +138,16 @@ public class EsTestApplication {
 		System.out.println(objectMapper.writeValueAsString(mapList));
 	}
 
+
+	@Test
+	public void test3(){
+		Iterable<EsOffersPO> all = offersRepository.findAll();
+		all.forEach(po -> {
+			po.setCityName("上海");
+		});
+		offersRepository.saveAll(all);
+
+		Iterable<EsOffersPO> all1 = offersRepository.findAll();
+		all1.forEach(System.out::println);
+	}
 }
