@@ -84,7 +84,8 @@ public class EsTestApplication {
 //		all.forEach(System.out::println);
 		BoolQueryBuilder result = new BoolQueryBuilder();
 		//模糊查询
-		result.must(QueryBuilders.wildcardQuery("title", "*250g*"));
+//		result.must(QueryBuilders.wildcardQuery("title", "88元代100元代金券"));
+		result.must(QueryBuilders.wildcardQuery("categoryIdList", "*1372786547735117836*"));
 		Iterable<EsOffersPO> search = offersRepository.search(result);
 		search.forEach(System.out::println);
 
@@ -149,5 +150,17 @@ public class EsTestApplication {
 
 		Iterable<EsOffersPO> all1 = offersRepository.findAll();
 		all1.forEach(System.out::println);
+	}
+
+
+	@Test
+	public void refreshCategoryData(){
+		BoolQueryBuilder result = new BoolQueryBuilder();
+		//模糊查询
+		result.must(QueryBuilders.termsQuery("postType", "2"));
+		Iterable<EsOffersPO> all = offersRepository.search(result);
+		all.forEach(data->data.setCategoryIdList(String.valueOf(data.getCategoryType())));
+		offersRepository.saveAll(all);
+		all.forEach(System.out::println);
 	}
 }

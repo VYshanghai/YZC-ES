@@ -60,6 +60,8 @@ public class OffersElasticsearchServiceImpl extends
 	@Resource(name = "esOffersSaveExecutor")
 	private TaskExecutor esOffersSaveExecutor;
 
+	public static final String categoryIdListFormat = "*%s*";
+
 	@Override
 	public EsSearchVO<String> keywordRecommend(OffersKeywordRecommendReq req) {
 		Page<String> page = page(req,
@@ -197,7 +199,8 @@ public class OffersElasticsearchServiceImpl extends
 		}
 		if (Objects.nonNull(req.getCategoryType())) {
 			result.must(
-					QueryBuilders.matchQuery(columnOf(EsOffersPO::getCategoryType), req.getCategoryType()));
+					QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getCategoryIdList),
+							String.format(categoryIdListFormat, req.getCategoryType())));
 		}
 		if (Objects.nonNull(req.getCouponType())) {
 			result
@@ -298,5 +301,10 @@ public class OffersElasticsearchServiceImpl extends
 	public static void defaultCopy(Object source, Object target) {
 		BeanCopier beanCopier = BeanCopier.create(source.getClass(), target.getClass(), false);
 		beanCopier.copy(source, target, null);
+	}
+
+	public static void main(String[] args) {
+		String s= "*%s*";
+		System.out.println(String.format(s,1234L));
 	}
 }
