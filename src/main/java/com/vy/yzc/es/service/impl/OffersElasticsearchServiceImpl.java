@@ -154,7 +154,8 @@ public class OffersElasticsearchServiceImpl extends
 			result.must(QueryBuilders
 					.termQuery(columnOf(EsOffersPO::getPostType), type.getCode()));
 		}
-		return QueryBuilders.functionScoreQuery(result, getWeightQuery(keyword));
+		return result;
+//		return QueryBuilders.functionScoreQuery(result, getWeightQuery(keyword));
 	}
 
 	public QueryBuilder getRecommendBuilder(String keyword) {
@@ -264,7 +265,7 @@ public class OffersElasticsearchServiceImpl extends
 		return SortBuilders.fieldSort(columnOf(columnFunc)).order(sortOrder);
 	}
 
-	public <T> String columnOf(SFunction<T, ?> fn) {
+	public static <T> String columnOf(SFunction<T, ?> fn) {
 		return ColumnUtils.getName(fn);
 	}
 
@@ -304,7 +305,9 @@ public class OffersElasticsearchServiceImpl extends
 	}
 
 	public static void main(String[] args) {
-		String s= "*%s*";
-		System.out.println(String.format(s,1234L));
+		long start = System.currentTimeMillis();
+		String s = columnOf(EsOffersPO::getTitle);
+		long end = System.currentTimeMillis();
+		System.out.println(end-start);
 	}
 }
