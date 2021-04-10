@@ -283,6 +283,7 @@ public class OffersElasticsearchServiceImpl extends
 
 	@Override
 	public Boolean saveReqs(List<EsOffersSaveReq> reqs) {
+		log.info("请求数据:[{}]", reqs);
 		if(CollectionUtils.isEmpty(reqs)){
 			return false;
 		}
@@ -292,6 +293,7 @@ public class OffersElasticsearchServiceImpl extends
 				defaultCopy(source, saveEntity);
 				return saveEntity;
 			}).collect(Collectors.toList());
+			log.info("开始保存数据,当前批次数量:[{}]", reqs.size());
 			esOffersRepository.saveAll(list);
 		}, esOffersSaveExecutor);
 		return true;
