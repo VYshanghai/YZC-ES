@@ -134,6 +134,7 @@ public class OffersElasticsearchServiceImpl extends
 
 	@Override
 	public Boolean batchDelete(List<Long> offersIds) {
+		log.info("开始删除数据" + offersIds.toString());
 		if (CollectionUtils.isEmpty(offersIds)) {
 			return false;
 		}

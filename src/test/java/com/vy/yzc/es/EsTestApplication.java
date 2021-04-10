@@ -85,7 +85,7 @@ public class EsTestApplication {
 		BoolQueryBuilder result = new BoolQueryBuilder();
 		//模糊查询
 //		result.must(QueryBuilders.wildcardQuery("title", "88元代100元代金券"));
-		result.must(QueryBuilders.wildcardQuery("categoryIdList", "*1372786547735117836*"));
+		result.must(QueryBuilders.termsQuery("offersId", "1380529426464567297"));
 		Iterable<EsOffersPO> search = offersRepository.search(result);
 		search.forEach(System.out::println);
 
