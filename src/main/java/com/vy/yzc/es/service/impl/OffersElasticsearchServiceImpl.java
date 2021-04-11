@@ -99,7 +99,7 @@ public class OffersElasticsearchServiceImpl extends
 				.orElseThrow(() -> new RuntimeException("未知的枚举"));
 
 		Page<Long> page = page(req,
-				q -> getKeywordBuilder(offersSearchType, q.getKeyword()),
+				q -> getKeywordBuilder(offersSearchType, q.getKeyword(), req.getInfoSource()),
 				getScoreSortBuilder(),
 				pos -> pos.stream().map(EsOffersPO::getOffersId).collect(Collectors.toList()));
 		return page2VO(page);
@@ -144,7 +144,7 @@ public class OffersElasticsearchServiceImpl extends
 		return true;
 	}
 
-	public QueryBuilder getKeywordBuilder(OffersSearchType type, String keyword) {
+	public QueryBuilder getKeywordBuilder(OffersSearchType type, String keyword, Integer infoSource) {
 		BoolQueryBuilder result = getCommonBuilder();
 		result.must(QueryBuilders
 				.multiMatchQuery(keyword, columnOf(EsOffersPO::getTitle), columnOf(EsOffersPO::getContent),
@@ -154,6 +154,9 @@ public class OffersElasticsearchServiceImpl extends
 		if (!Objects.equals(type, OffersSearchType.ALL)) {
 			result.must(QueryBuilders
 					.termQuery(columnOf(EsOffersPO::getPostType), type.getCode()));
+		}
+		if (Objects.nonNull(infoSource)) {
+			result.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), infoSource));
 		}
 		return result;
 //		return QueryBuilders.functionScoreQuery(result, getWeightQuery(keyword));
