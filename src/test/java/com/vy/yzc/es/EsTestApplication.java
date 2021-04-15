@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.assertj.core.util.Lists;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetMappingsRequest;
@@ -40,20 +41,39 @@ public class EsTestApplication {
 	private OffersRepository offersRepository;
 
 //	@Test
-//	public void test(){
-//
-//		BoolQueryBuilder result = new BoolQueryBuilder();
-//		result.must(QueryBuilders.matchQuery("title", "运动"));
-//		Iterable<EsOffersPO> search = offersRepository.search(result, PageRequest.of(0,10));
-//
-//		Lists.newArrayList(search).forEach(System.out::println);
-////		System.out.println(offersRepository.findById(1375070232629309470L));
-//	}
-//
+////	public void test(){
+////
+////		BoolQueryBuilder result = new BoolQueryBuilder();
+////		result.must(QueryBuilders.matchQuery("title", "运动"));
+////		Iterable<EsOffersPO> search = offersRepository.search(result, PageRequest.of(0,10));
+////
+////		Lists.newArrayList(search).forEach(System.out::println);
+//////		System.out.println(offersRepository.findById(1375070232629309470L));
+////	}
+////
+
 
 	@Test
-	public void delete(){
-		offersRepository.deleteById(1234L);
+	public void batchDelete(){
+
+		List<Long> ids = Lists.newArrayList(1380404321803317250L,
+				1380472788019589121L,
+				1380376717155119106L,
+				1380402195949694977L,
+				1379359778881679361L,
+				1379360278993711106L,
+				1380092460855734273L);
+		ids.forEach(id->offersRepository.deleteById(id));
+	}
+
+
+	@Autowired
+	OffersElasticsearchService offersElasticsearchService;
+	@Test
+	public void batchLogicDelete(){
+		List<Long> offersIds = Lists.newArrayList(
+				1382176193361227778L,1382177589183655937L);
+		offersElasticsearchService.updateDeletedState(offersIds,1);
 	}
 
 	@Test
@@ -67,9 +87,16 @@ public class EsTestApplication {
 				.categoryType(1L)
 				.categoryName("name")
 				.location("31.231706,121.472644")
+				.shopName("shopName")
 				.deleted(1)
 				.build();
 		offersRepository.save(build);
+	}
+
+
+	@Test
+	public void delete(){
+		offersRepository.deleteById(1234L);
 	}
 
 	/*@Autowired
@@ -91,8 +118,6 @@ public class EsTestApplication {
 
 	}
 
-	@Autowired
-	OffersElasticsearchService offersElasticsearchService;
 
 	@Test
 	public void  testNear(){
