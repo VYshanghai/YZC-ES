@@ -49,6 +49,14 @@ public class EsProvider {
 	}
 
 	/**
+	 * 根据关键词分页搜索——后台
+	 */
+	@PostMapping("/search/keyword/background")
+	public EsSearchVO<Long> searchKeywordForBackground(@RequestBody OffersSearchReq req){
+		return offersElasticsearchService.searchKeywordForBackground(req);
+	}
+
+	/**
 	 * 根据条件过滤筛选
 	 */
 	@PostMapping("/search/filter")

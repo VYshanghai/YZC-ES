@@ -9,6 +9,7 @@ import com.vy.yzc.es.dto.OffersKeywordRecommendReq;
 import com.vy.yzc.es.dto.OffersNearReq;
 import com.vy.yzc.es.dto.OffersSearchReq;
 import com.vy.yzc.es.dto.OffersSearchType;
+import com.vy.yzc.es.enums.MatchFieldEnum;
 import com.vy.yzc.es.service.OffersElasticsearchService;
 import com.vy.yzc.es.service.base.BaseEsServiceImpl;
 import com.vy.yzc.es.toolkit.ColumnUtils;
@@ -103,6 +104,55 @@ public class OffersElasticsearchServiceImpl extends
 				getScoreSortBuilder(),
 				pos -> pos.stream().map(EsOffersPO::getOffersId).collect(Collectors.toList()));
 		return page2VO(page);
+	}
+
+	@Override
+	public EsSearchVO<Long> searchKeywordForBackground(OffersSearchReq req) {
+		OffersSearchType offersSearchType = Optional
+				.ofNullable(OffersSearchType.getByCode(req.getType()))
+				.orElseThrow(() -> new RuntimeException("未知的枚举"));
+		MatchFieldEnum matchField = MatchFieldEnum.getEnumByCode(req.getMatchField());
+		Page<Long> page = page(req,
+				q -> getKeywordBuilder2(matchField, offersSearchType, q.getKeyword(), req.getInfoSource()),
+				getScoreSortBuilder(),
+				pos -> pos.stream().map(EsOffersPO::getOffersId).collect(Collectors.toList()));
+		return page2VO(page);
+	}
+
+	private QueryBuilder getKeywordBuilder2(MatchFieldEnum matchField,
+			OffersSearchType offersSearchType, String keyword, Integer infoSource) {
+		BoolQueryBuilder result = getCommonBuilder();
+		switch (matchField) {
+			case SHOP_NAME:
+				result.must(QueryBuilders
+						.multiMatchQuery(keyword, columnOf(EsOffersPO::getShopName))
+						.analyzer("ik_smart"));
+				break;
+			case OFFERS_TITLE:
+				result.must(QueryBuilders
+						.multiMatchQuery(keyword, columnOf(EsOffersPO::getTitle))
+						.analyzer("ik_smart"));
+				break;
+			case OFFERS_CONTENT:
+				result.must(QueryBuilders
+						.multiMatchQuery(keyword, columnOf(EsOffersPO::getContent))
+						.analyzer("ik_smart"));
+				break;
+			default:
+				result.must(QueryBuilders
+						.multiMatchQuery(keyword, columnOf(EsOffersPO::getTitle),
+								columnOf(EsOffersPO::getContent),
+								columnOf(EsOffersPO::getCategoryName), columnOf(EsOffersPO::getShopName))
+						.analyzer("ik_smart"));
+		}
+		if (!Objects.equals(offersSearchType, OffersSearchType.ALL)) {
+			result.must(QueryBuilders
+					.termQuery(columnOf(EsOffersPO::getPostType), offersSearchType.getCode()));
+		}
+		if (Objects.nonNull(infoSource)) {
+			result.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), infoSource));
+		}
+		return result;
 	}
 
 	@Override
@@ -287,7 +337,7 @@ public class OffersElasticsearchServiceImpl extends
 	@Override
 	public Boolean saveReqs(List<EsOffersSaveReq> reqs) {
 		log.info("请求数据:[{}]", reqs);
-		if(CollectionUtils.isEmpty(reqs)){
+		if (CollectionUtils.isEmpty(reqs)) {
 			return false;
 		}
 		CompletableFuture.runAsync(() -> {
@@ -314,6 +364,6 @@ public class OffersElasticsearchServiceImpl extends
 		long start = System.currentTimeMillis();
 		String s = columnOf(EsOffersPO::getTitle);
 		long end = System.currentTimeMillis();
-		System.out.println(end-start);
+		System.out.println(end - start);
 	}
 }

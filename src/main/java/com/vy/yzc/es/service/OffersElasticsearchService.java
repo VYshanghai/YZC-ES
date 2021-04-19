@@ -33,6 +33,15 @@ public interface OffersElasticsearchService extends BaseEsService<EsOffersPO, Of
 	EsSearchVO<Long> searchKeyword(OffersSearchReq req);
 
 	/**
+	 * description: 根据相关条件查询。
+	 * @param req 查询条件
+	 * @return {@linkplain Long}
+	 * @Date: 2021-04-16 15:15:49
+	 * @Author: 飞拳
+	 */
+	EsSearchVO<Long> searchKeywordForBackground(OffersSearchReq req);
+
+	/**
 	 * 根据条件过滤筛选
 	 * @param req
 	 * @return
