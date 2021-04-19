@@ -124,19 +124,16 @@ public class OffersElasticsearchServiceImpl extends
 		BoolQueryBuilder result = getCommonBuilder();
 		switch (matchField) {
 			case SHOP_NAME:
-				result.must(QueryBuilders
-						.multiMatchQuery(keyword, columnOf(EsOffersPO::getShopName))
-						.analyzer("ik_smart"));
+				result.must(QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getShopName),
+						String.format(categoryIdListFormat, keyword)));
 				break;
 			case OFFERS_TITLE:
-				result.must(QueryBuilders
-						.multiMatchQuery(keyword, columnOf(EsOffersPO::getTitle))
-						.analyzer("ik_smart"));
+				result.must(QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getTitle),
+						String.format(categoryIdListFormat, keyword)));
 				break;
 			case OFFERS_CONTENT:
-				result.must(QueryBuilders
-						.multiMatchQuery(keyword, columnOf(EsOffersPO::getContent))
-						.analyzer("ik_smart"));
+				result.must(QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getContent),
+						String.format(categoryIdListFormat, keyword)));
 				break;
 			default:
 				result.must(QueryBuilders
