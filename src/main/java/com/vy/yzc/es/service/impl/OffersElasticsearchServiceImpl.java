@@ -247,7 +247,7 @@ public class OffersElasticsearchServiceImpl extends
 		BoolQueryBuilder result = getCommonBuilder();
 		if (Objects.nonNull(req.getDistance())) {
 			if (Objects.isNull(req.getLat()) || Objects.isNull(req.getLng())) {
-				//todo
+				//todo for commit
 				throw new RuntimeException("location info");
 			}
 			result.filter(getGeoBuilder(req.getLat(), req.getLng(), req.getDistance()));
