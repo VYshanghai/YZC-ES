@@ -261,9 +261,19 @@ public class OffersElasticsearchServiceImpl extends
 			result
 					.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getCouponType), req.getCouponType()));
 		}
+		//todo
 		if (Objects.nonNull(req.getPlatform())) {
-			result
-					.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getPlatform), req.getPlatform()));
+			if (req.getPlatform() == 8) {
+				result
+						.must(QueryBuilders.boolQuery()
+								.should(QueryBuilders.termQuery(columnOf(EsOffersPO::getPlatform), 6))
+								.should(QueryBuilders.termQuery(columnOf(EsOffersPO::getPlatform), 8))
+						);
+			} else {
+				result
+						.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getPlatform), req.getPlatform()));
+
+			}
 		}
 		if (Objects.nonNull(req.getInfoSource())) {
 			result

@@ -14,7 +14,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import javax.ws.rs.PUT;
 import org.assertj.core.util.Lists;
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetMappingsRequest;
@@ -22,10 +28,14 @@ import org.elasticsearch.client.indices.GetMappingsResponse;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -112,9 +122,15 @@ public class EsTestApplication {
 		BoolQueryBuilder result = new BoolQueryBuilder();
 		//模糊查询
 //		result.must(QueryBuilders.wildcardQuery("title", "88元代100元代金券"));
-		result.must(QueryBuilders.termsQuery("offersId", "1380529426464567297"));
+		result.must(QueryBuilders.termsQuery("infoSource", "3"));
+		result.must(QueryBuilders.termsQuery("deleted", "0"));
 		Iterable<EsOffersPO> search = offersRepository.search(result);
-		search.forEach(System.out::println);
+		List<Long> xkcIds = Lists.newArrayList(search).stream().map(EsOffersPO::getOffersId)
+				.limit(2000).collect(Collectors.toList());
+		xkcIds.forEach(id->offersRepository.deleteById(id));
+//		Boolean aBoolean = offersElasticsearchService.batchDelete(xkcIds);
+//		System.out.println(aBoolean);
+		System.out.println("----");
 
 	}
 
@@ -188,4 +204,41 @@ public class EsTestApplication {
 		offersRepository.saveAll(all);
 		all.forEach(System.out::println);
 	}
+
+	@Test
+	public void testMatchPhaseQuery(){
+		BoolQueryBuilder result = new BoolQueryBuilder();
+		//模糊查询
+		result.must(QueryBuilders.fuzzyQuery("title", "员单"));
+		Iterable<EsOffersPO> all = offersRepository.search(result);
+		all.forEach(System.out::println);
+	}
+
+//	@Autowired
+//	ElasticsearchTemplate elasticsearchTemplate;
+//	@Test
+//	public void testScroll(){
+//		Client client = elasticsearchTemplate.getClient();
+//		SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+//		sourceBuilder.query(QueryBuilders.matchAllQuery());
+//		sourceBuilder.sort("_id", SortOrder.DESC);
+//		SearchRequest searchRequest = new SearchRequest();
+//		searchRequest.indices("threat_tool");
+//		sourceBuilder.size(100);
+//		searchRequest.source(sourceBuilder);
+//		ActionFuture<SearchResponse> response =null;
+//		SearchHit[] hits = null;
+//		while (true){
+//			if(hits!=null){
+//				SearchHit last = hits[hits.length - 1];
+//
+//
+//				sourceBuilder.searchAfter(last.getSortValues());
+//				searchRequest.source(sourceBuilder);
+//			}
+//			response = client.search(searchRequest);
+//			hits = response.actionGet().getHits().getHits();
+//			System.out.println( hits.length);
+//		}
+//	}
 }
