@@ -203,7 +203,17 @@ public class OffersElasticsearchServiceImpl extends
 					.termQuery(columnOf(EsOffersPO::getPostType), type.getCode()));
 		}
 		if (Objects.nonNull(infoSource)) {
-			result.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), infoSource));
+				if (infoSource == 2) {
+					result
+							.must(QueryBuilders.boolQuery()
+									.should(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), 2))
+									.should(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), 3))
+							);
+				} else {
+					result
+							.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), infoSource));
+
+				}
 		}
 		return result;
 //		return QueryBuilders.functionScoreQuery(result, getWeightQuery(keyword));

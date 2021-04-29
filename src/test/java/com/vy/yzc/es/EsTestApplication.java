@@ -122,12 +122,12 @@ public class EsTestApplication {
 		BoolQueryBuilder result = new BoolQueryBuilder();
 		//模糊查询
 //		result.must(QueryBuilders.wildcardQuery("title", "88元代100元代金券"));
-		result.must(QueryBuilders.termsQuery("infoSource", "3"));
-		result.must(QueryBuilders.termsQuery("deleted", "0"));
+		result.must(QueryBuilders.termsQuery("platform", "6"));
+//		result.must(QueryBuilders.termsQuery("deleted", "0"));
 		Iterable<EsOffersPO> search = offersRepository.search(result);
 		List<Long> xkcIds = Lists.newArrayList(search).stream().map(EsOffersPO::getOffersId)
-				.limit(2000).collect(Collectors.toList());
-		xkcIds.forEach(id->offersRepository.deleteById(id));
+				.collect(Collectors.toList());
+		xkcIds.parallelStream().forEach(id->offersRepository.deleteById(id));
 //		Boolean aBoolean = offersElasticsearchService.batchDelete(xkcIds);
 //		System.out.println(aBoolean);
 		System.out.println("----");
