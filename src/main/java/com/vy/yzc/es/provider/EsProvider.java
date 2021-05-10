@@ -6,6 +6,8 @@ import com.vy.yzc.es.dto.EsSearchVO;
 import com.vy.yzc.es.dto.OffersFilterReq;
 import com.vy.yzc.es.dto.OffersKeywordRecommendReq;
 import com.vy.yzc.es.dto.OffersNearReq;
+import com.vy.yzc.es.dto.OffersOfflineSearchReq;
+import com.vy.yzc.es.dto.OffersOnlineSearchReq;
 import com.vy.yzc.es.dto.OffersSearchReq;
 import com.vy.yzc.es.service.OffersElasticsearchService;
 import java.util.List;
@@ -106,4 +108,13 @@ public class EsProvider {
 		return offersElasticsearchService.saveReqs(reqs);
 	}
 
+	@PostMapping("/search/offline")
+	public EsSearchVO<Long> searchOffline(@Valid @RequestBody OffersOfflineSearchReq req) {
+		return offersElasticsearchService.searchOffline(req);
+	}
+
+	@PostMapping("/search/online")
+	public EsSearchVO<Long> searchOnline(@Valid @RequestBody OffersOnlineSearchReq req) {
+		return offersElasticsearchService.searchOnline(req);
+	}
 }

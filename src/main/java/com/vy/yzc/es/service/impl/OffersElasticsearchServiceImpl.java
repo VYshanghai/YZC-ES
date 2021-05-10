@@ -7,6 +7,8 @@ import com.vy.yzc.es.dto.EsSearchVO;
 import com.vy.yzc.es.dto.OffersFilterReq;
 import com.vy.yzc.es.dto.OffersKeywordRecommendReq;
 import com.vy.yzc.es.dto.OffersNearReq;
+import com.vy.yzc.es.dto.OffersOfflineSearchReq;
+import com.vy.yzc.es.dto.OffersOnlineSearchReq;
 import com.vy.yzc.es.dto.OffersSearchReq;
 import com.vy.yzc.es.dto.OffersSearchType;
 import com.vy.yzc.es.enums.MatchFieldEnum;
@@ -42,6 +44,7 @@ import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -61,7 +64,7 @@ public class OffersElasticsearchServiceImpl extends
 	@Resource(name = "esOffersSaveExecutor")
 	private TaskExecutor esOffersSaveExecutor;
 
-	public static final String categoryIdListFormat = "*%s*";
+	public static final String searchLikeFormat = "*%s*";
 
 	@Override
 	public EsSearchVO<String> keywordRecommend(OffersKeywordRecommendReq req) {
@@ -125,15 +128,15 @@ public class OffersElasticsearchServiceImpl extends
 		switch (matchField) {
 			case SHOP_NAME:
 				result.must(QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getShopName),
-						String.format(categoryIdListFormat, keyword)));
+						String.format(searchLikeFormat, keyword)));
 				break;
 			case OFFERS_TITLE:
 				result.must(QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getTitle),
-						String.format(categoryIdListFormat, keyword)));
+						String.format(searchLikeFormat, keyword)));
 				break;
 			case OFFERS_CONTENT:
 				result.must(QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getContent),
-						String.format(categoryIdListFormat, keyword)));
+						String.format(searchLikeFormat, keyword)));
 				break;
 			default:
 				result.must(QueryBuilders
@@ -203,17 +206,17 @@ public class OffersElasticsearchServiceImpl extends
 					.termQuery(columnOf(EsOffersPO::getPostType), type.getCode()));
 		}
 		if (Objects.nonNull(infoSource)) {
-				if (infoSource == 2) {
-					result
-							.must(QueryBuilders.boolQuery()
-									.should(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), 2))
-									.should(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), 3))
-							);
-				} else {
-					result
-							.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), infoSource));
+			if (infoSource == 2) {
+				result
+						.must(QueryBuilders.boolQuery()
+								.should(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), 2))
+								.should(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), 3))
+						);
+			} else {
+				result
+						.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getInfoSource), infoSource));
 
-				}
+			}
 		}
 		return result;
 //		return QueryBuilders.functionScoreQuery(result, getWeightQuery(keyword));
@@ -262,7 +265,7 @@ public class OffersElasticsearchServiceImpl extends
 		if (Objects.nonNull(req.getCategoryType())) {
 			result.must(
 					QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getCategoryIdList),
-							String.format(categoryIdListFormat, req.getCategoryType())));
+							String.format(searchLikeFormat, req.getCategoryType())));
 		}
 		if (Objects.nonNull(req.getCouponType())) {
 			result
@@ -353,7 +356,7 @@ public class OffersElasticsearchServiceImpl extends
 
 	@Override
 	public Boolean saveReqs(List<EsOffersSaveReq> reqs) {
-		log.info("请求数据:[{}]", reqs);
+		log.info("请求数据数量:[{}]", reqs.size());
 		if (CollectionUtils.isEmpty(reqs)) {
 			return false;
 		}
@@ -376,6 +379,107 @@ public class OffersElasticsearchServiceImpl extends
 		BeanCopier beanCopier = BeanCopier.create(source.getClass(), target.getClass(), false);
 		beanCopier.copy(source, target, null);
 	}
+
+	@Override
+	public EsSearchVO<Long> searchOffline(OffersOfflineSearchReq req) {
+		Page<Long> page = page(req,
+				q -> getOfflineQuery(req),
+				getOfflineSortBuilder(req),
+				pos -> pos.stream()
+						.sorted(Comparator.comparing(EsOffersPO::getCreatedTime).reversed())
+						.map(EsOffersPO::getOffersId)
+						.collect(Collectors.toList()));
+		return page2VO(page);
+	}
+
+	private QueryBuilder getOfflineQuery(OffersOfflineSearchReq req) {
+		//通用处理
+		BoolQueryBuilder result = getCommonBuilder();
+		Assert.notNull(req.getPlatform(), "线下搜索平台类型不能为空");
+		result.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getPlatform), req.getPlatform()));
+		//关键词
+		if (Objects.nonNull(req.getKeyword())) {
+			result.must(QueryBuilders
+					.multiMatchQuery(req.getKeyword(), columnOf(EsOffersPO::getTitle),
+							columnOf(EsOffersPO::getContent),
+							columnOf(EsOffersPO::getCategoryName), columnOf(EsOffersPO::getShopName))
+					.analyzer("ik_smart"));
+		}
+		//距离
+		if (Objects.nonNull(req.getDistance())) {
+			if (Objects.isNull(req.getLat()) || Objects.isNull(req.getLng())) {
+				//todo for commit
+				throw new RuntimeException("location info");
+			}
+			result.filter(getGeoBuilder(req.getLat(), req.getLng(), req.getDistance()));
+		}
+		//分类
+		if (Objects.nonNull(req.getCategoryType())) {
+			result.must(
+					QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getCategoryIdList),
+							String.format(searchLikeFormat, req.getCategoryType())));
+		}
+		//商圈
+		if (Objects.nonNull(req.getRegionId())) {
+			result.must(
+					QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getRegionIdList),
+							String.format(searchLikeFormat, req.getRegionId())));
+		}
+		//处理价格
+		if (Objects.nonNull(req.getLowPrice())) {
+			result.must(QueryBuilders.rangeQuery(columnOf(EsOffersPO::getPrice)).gt(req.getLowPrice()));
+		}
+		if (Objects.nonNull(req.getHighPrice())) {
+			result.must(QueryBuilders.rangeQuery(columnOf(EsOffersPO::getPrice)).gt(req.getHighPrice()));
+		}
+		return result;
+	}
+
+
+	private SortBuilder getOfflineSortBuilder(OffersOfflineSearchReq req) {
+		boolean isLocate = Objects.nonNull(req.getLat()) && Objects.nonNull(req.getLng());
+		//线下 todo enum
+		if (req.getSortType() == 1 && isLocate) {
+			GeoDistanceSortBuilder disSortBuilder = new GeoDistanceSortBuilder(
+					columnOf(EsOffersPO::getLocation),
+					req.getLat().doubleValue(), req.getLng().doubleValue());
+			disSortBuilder.order(SortOrder.ASC);
+			disSortBuilder.unit(DistanceUnit.METERS);
+			return disSortBuilder;
+		}
+		return new FieldSortBuilder(columnOf(EsOffersPO::getDiscountPrice)).order(SortOrder.DESC);
+	}
+
+	@Override
+	public EsSearchVO<Long> searchOnline(OffersOnlineSearchReq req) {
+		Page<Long> page = page(req,
+				q -> getOnlineQuery(req),
+				getOnlineSortBuilder(req),
+				pos -> pos.stream()
+						.sorted(Comparator.comparing(EsOffersPO::getCreatedTime).reversed())
+						.map(EsOffersPO::getOffersId)
+						.collect(Collectors.toList()));
+		return page2VO(page);
+	}
+
+	private SortBuilder getOnlineSortBuilder(OffersOnlineSearchReq req) {
+		return new FieldSortBuilder(columnOf(EsOffersPO::getCreatedTime)).order(SortOrder.ASC);
+	}
+
+	private QueryBuilder getOnlineQuery(OffersOnlineSearchReq req) {
+		//通用处理
+		BoolQueryBuilder result = getCommonBuilder();
+		//分类
+		if (Objects.nonNull(req.getCategoryType())) {
+			result.must(
+					QueryBuilders.wildcardQuery(columnOf(EsOffersPO::getCategoryIdList),
+							String.format(searchLikeFormat, req.getCategoryType())));
+		}
+		Assert.notNull(req.getPlatform(), "线上搜索平台类型不能为空");
+		result.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getPlatform), req.getPlatform()));
+		return result;
+	}
+
 
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();

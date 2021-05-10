@@ -113,4 +113,19 @@ public class EsOffersPO {
 	 */
 	private String cityName;
 
+	/**
+	 * 商圈id，用英文逗号隔开
+	 */
+	private String regionIdList;
+
+	/**
+	 * 价格
+	 */
+	private Integer price;
+
+	/**
+	 * 折扣减去的价格 = 原价 - 现价
+	 */
+	private Integer discountPrice;
+
 }

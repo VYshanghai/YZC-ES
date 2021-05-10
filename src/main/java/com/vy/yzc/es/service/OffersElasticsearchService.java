@@ -7,6 +7,8 @@ import com.vy.yzc.es.dto.EsSearchVO;
 import com.vy.yzc.es.dto.OffersFilterReq;
 import com.vy.yzc.es.dto.OffersKeywordRecommendReq;
 import com.vy.yzc.es.dto.OffersNearReq;
+import com.vy.yzc.es.dto.OffersOfflineSearchReq;
+import com.vy.yzc.es.dto.OffersOnlineSearchReq;
 import com.vy.yzc.es.dto.OffersSearchReq;
 import com.vy.yzc.es.service.base.BaseEsService;
 import java.util.List;
@@ -85,4 +87,18 @@ public interface OffersElasticsearchService extends BaseEsService<EsOffersPO, Of
 	 * @return
 	 */
 	Boolean saveReqs(List<EsOffersSaveReq> reqs);
+
+	/**
+	 * 搜索线下offers信息
+	 * @param req
+	 * @return
+	 */
+	EsSearchVO<Long> searchOffline(OffersOfflineSearchReq req);
+
+	/**
+	 * 搜索线上offers信息
+	 * @param req
+	 * @return
+	 */
+	EsSearchVO<Long> searchOnline(OffersOnlineSearchReq req);
 }
