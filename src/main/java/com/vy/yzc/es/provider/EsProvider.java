@@ -102,6 +102,7 @@ public class EsProvider {
 
 	/**
 	 * 批量新增req
+	 * new commit
 	 */
 	@PostMapping("/save/reqs")
 	public Boolean saveReqs(@RequestBody List<EsOffersSaveReq> reqs){

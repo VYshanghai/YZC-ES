@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.ws.rs.PUT;
 import org.assertj.core.util.Lists;
@@ -130,6 +131,17 @@ public class EsTestApplication {
 		xkcIds.parallelStream().forEach(id->offersRepository.deleteById(id));
 //		Boolean aBoolean = offersElasticsearchService.batchDelete(xkcIds);
 //		System.out.println(aBoolean);
+		System.out.println("----");
+
+	}
+	@Test
+	public void testOffers(){
+		BoolQueryBuilder result = new BoolQueryBuilder();
+		//模糊查询
+//		result.must(QueryBuilders.wildcardQuery("title", "88元代100元代金券"));
+		result.must(QueryBuilders.termsQuery("offersId", "1382577208063389699"));
+//		Iterable<EsOffersPO> search = offersRepository.search(result);
+		Optional<EsOffersPO> byId = offersRepository.findById(1392373010284011522L);
 		System.out.println("----");
 
 	}
