@@ -438,8 +438,8 @@ public class OffersElasticsearchServiceImpl extends
 
 	private SortBuilder getOfflineSortBuilder(OffersOfflineSearchReq req) {
 		boolean isLocate = Objects.nonNull(req.getLat()) && Objects.nonNull(req.getLng());
-		//线下 todo enum
-		if (req.getSortType() == 1 && isLocate) {
+		//默认是按照距离排序
+		if ((Objects.isNull(req.getSortType()) || req.getSortType() == 1) && isLocate) {
 			GeoDistanceSortBuilder disSortBuilder = new GeoDistanceSortBuilder(
 					columnOf(EsOffersPO::getLocation),
 					req.getLat().doubleValue(), req.getLng().doubleValue());
