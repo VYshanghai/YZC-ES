@@ -427,10 +427,10 @@ public class OffersElasticsearchServiceImpl extends
 		}
 		//处理价格
 		if (Objects.nonNull(req.getLowPrice())) {
-			result.must(QueryBuilders.rangeQuery(columnOf(EsOffersPO::getPrice)).gt(req.getLowPrice()));
+			result.must(QueryBuilders.rangeQuery(columnOf(EsOffersPO::getPrice)).gte(req.getLowPrice()));
 		}
 		if (Objects.nonNull(req.getHighPrice())) {
-			result.must(QueryBuilders.rangeQuery(columnOf(EsOffersPO::getPrice)).gt(req.getHighPrice()));
+			result.must(QueryBuilders.rangeQuery(columnOf(EsOffersPO::getPrice)).lte(req.getHighPrice()));
 		}
 		return result;
 	}
