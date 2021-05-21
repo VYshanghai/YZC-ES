@@ -101,4 +101,11 @@ public interface OffersElasticsearchService extends BaseEsService<EsOffersPO, Of
 	 * @return
 	 */
 	EsSearchVO<Long> searchOnline(OffersOnlineSearchReq req);
+
+	/**
+	 * 更新不为空的字段
+	 * @param reqs
+	 * @return
+	 */
+	Boolean updateNonNullValue(List<EsOffersSaveReq> reqs);
 }

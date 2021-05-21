@@ -14,17 +14,24 @@ import com.vy.yzc.es.dto.OffersSearchType;
 import com.vy.yzc.es.enums.MatchFieldEnum;
 import com.vy.yzc.es.service.OffersElasticsearchService;
 import com.vy.yzc.es.service.base.BaseEsServiceImpl;
+import com.vy.yzc.es.toolkit.BeanUtils;
 import com.vy.yzc.es.toolkit.ColumnUtils;
 import com.vy.yzc.es.toolkit.SFunction;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -60,6 +67,9 @@ public class OffersElasticsearchServiceImpl extends
 
 	@Autowired
 	OffersRepository esOffersRepository;
+	@Autowired
+	private RestHighLevelClient restHighLevelClient;
+
 
 	@Resource(name = "esOffersSaveExecutor")
 	private TaskExecutor esOffersSaveExecutor;
@@ -480,6 +490,26 @@ public class OffersElasticsearchServiceImpl extends
 		return result;
 	}
 
+	@Override
+	public Boolean updateNonNullValue(List<EsOffersSaveReq> reqs) {
+		String index = getIndices();
+		String type = getTypes();
+		reqs.stream().map(req -> {
+			Map<String, Object> map = BeanUtils.objectToMap(req, false);
+			return new UpdateRequest(index, type,
+					map.get(columnOf(EsOffersPO::getOffersId)).toString())
+					.doc(map);
+		}).collect(Collectors.toList()).parallelStream().forEach(this::doUpdate);
+		return true;
+	}
+
+	private void doUpdate(UpdateRequest request){
+		try {
+			restHighLevelClient.update(request, RequestOptions.DEFAULT);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();

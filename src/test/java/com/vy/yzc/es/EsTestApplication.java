@@ -3,6 +3,7 @@ package com.vy.yzc.es;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vy.yzc.es.dal.repo.OffersRepository;
 import com.vy.yzc.es.dal.repo.model.EsOffersPO;
+import com.vy.yzc.es.dto.EsOffersSaveReq;
 import com.vy.yzc.es.dto.EsSearchVO;
 import com.vy.yzc.es.dto.OffersNearReq;
 import com.vy.yzc.es.service.OffersElasticsearchService;
@@ -17,13 +18,20 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetMappingsRequest;
 import org.elasticsearch.client.indices.GetMappingsResponse;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.index.get.GetResult;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.UpdateByQueryAction;
+import org.elasticsearch.index.reindex.UpdateByQueryRequestBuilder;
+import org.elasticsearch.script.Script;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -229,5 +237,29 @@ public class EsTestApplication {
 		System.out.println(1);
 	}
 
+	@Test
+	public void testClient() throws Exception{
+		Map<String, Object> jsonMap = new HashMap<>();
+		jsonMap.put("title", "vikko 测试用restHighLevelClient更新字段");
+		jsonMap.put("platform", -1);
+		UpdateRequest request = new UpdateRequest("visva-yzc-beta", "offers", "1392361395788402733")
+				.doc(jsonMap);
+		UpdateResponse response = restHighLevelClient.update(request, RequestOptions.DEFAULT);
+		GetResult getResult = response.getGetResult();
+
+	}
+
+	@Test
+	public void testUpdateEs(){
+		List<EsOffersSaveReq> reqs = Lists
+				.newArrayList(1392328171557167159L, 1392328198438461626L, 1392328205396811847L).stream()
+				.map(id -> {
+					return EsOffersSaveReq.builder()
+							.offersId(id)
+							.deleted(1)
+							.build();
+				}).collect(Collectors.toList());
+		offersElasticsearchService.updateNonNullValue(reqs);
+	}
 
 }

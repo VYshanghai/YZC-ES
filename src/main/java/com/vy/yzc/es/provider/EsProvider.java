@@ -109,6 +109,15 @@ public class EsProvider {
 		return offersElasticsearchService.saveReqs(reqs);
 	}
 
+	/**
+	 * 批量新增req
+	 * new commit-3
+	 */
+	@PostMapping("/update/reqs")
+	public Boolean updateNonNullValue(@RequestBody List<EsOffersSaveReq> reqs){
+		return offersElasticsearchService.updateNonNullValue(reqs);
+	}
+
 	@PostMapping("/search/offline")
 	public EsSearchVO<Long> searchOffline(@Valid @RequestBody OffersOfflineSearchReq req) {
 		return offersElasticsearchService.searchOffline(req);
