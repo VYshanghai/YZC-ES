@@ -1,2 +1,2 @@
 es:
-  host: yzc-es-sit:9200
+  host: 172.16.9.31:9200
