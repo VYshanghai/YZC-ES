@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.elasticsearch.common.geo.GeoPoint;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -71,9 +70,8 @@ public class EsOffersPO {
 	 * 例如：31.231706,121.472644
 	 * 英文逗号
 	 */
-
 	@GeoPointField
-	private GeoPoint geoPoint;
+	private String location;
 
 	/**
 	 * 优惠标签：0 未知 1 满减 2 折扣 3 满赠 4 低价 5 优惠套餐。默认 0

@@ -98,7 +98,7 @@ public class EsTestApplication {
 				.postType(1)
 				.categoryType(1L)
 				.categoryName("name")
-//				.location("31.231706,121.472644")
+				.location("31.231706,121.472644")
 				.shopName("shopName")
 				.deleted(1)
 				.build();
