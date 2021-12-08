@@ -1,4 +1,4 @@
 es:
-  host: es-cn-n6w23juw3004svz6d.elasticsearch.aliyuncs.com:9200
+  host: 172.17.188.12:9200
   username: elastic
-  password: QWERasdf1234
+  password: WmaiVisva2018
