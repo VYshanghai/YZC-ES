@@ -259,7 +259,7 @@ public class OffersElasticsearchServiceImpl extends
 		BoolQueryBuilder result = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getDeleted), 0));
 //		result.must(getTimeValidStartQuery());
-		result.must(getTimeValidEndQuery());
+//		result.must(getTimeValidEndQuery());
 		return result;
 	}
 
@@ -322,7 +322,7 @@ public class OffersElasticsearchServiceImpl extends
 	}
 
 	private QueryBuilder getGeoBuilder(BigDecimal lat, BigDecimal lng, Integer distance) {
-		return new GeoDistanceQueryBuilder(columnOf(EsOffersPO::getLocation))
+		return new GeoDistanceQueryBuilder(columnOf(EsOffersPO::getGeoPoint))
 				.distance(String.valueOf(distance), DistanceUnit.METERS)
 				.point(new GeoPoint(lat.doubleValue(), lng.doubleValue()));
 	}
@@ -332,7 +332,7 @@ public class OffersElasticsearchServiceImpl extends
 		if (postType == 2 && isLocate) {
 			//线下 todo enum
 			GeoDistanceSortBuilder disSortBuilder = new GeoDistanceSortBuilder(
-					columnOf(EsOffersPO::getLocation),
+					columnOf(EsOffersPO::getGeoPoint),
 					lat.doubleValue(), lng.doubleValue());
 			disSortBuilder.order(SortOrder.ASC);
 			disSortBuilder.unit(DistanceUnit.METERS);
@@ -374,6 +374,12 @@ public class OffersElasticsearchServiceImpl extends
 			List<EsOffersPO> list = reqs.stream().map(source -> {
 				EsOffersPO saveEntity = new EsOffersPO();
 				defaultCopy(source, saveEntity);
+				String locationStr = source.getLocation();
+				if(Objects.nonNull(locationStr) || locationStr.contains(",")){
+					String[] split = locationStr.split(",");
+					GeoPoint geoPoint = new GeoPoint(convert(split[0]), convert(split[1]));
+					saveEntity.setGeoPoint(geoPoint);
+				}
 				return saveEntity;
 			}).collect(Collectors.toList());
 			log.info("开始保存数据,当前批次数量:[{}]", reqs.size());
@@ -382,6 +388,10 @@ public class OffersElasticsearchServiceImpl extends
 		return true;
 	}
 
+
+	private Double convert(String s){
+		return Double.valueOf(s);
+	}
 	/**
 	 * todo
 	 */
@@ -451,7 +461,7 @@ public class OffersElasticsearchServiceImpl extends
 		//默认是按照距离排序
 		if ((Objects.isNull(req.getSortType()) || req.getSortType() == 1) && isLocate) {
 			GeoDistanceSortBuilder disSortBuilder = new GeoDistanceSortBuilder(
-					columnOf(EsOffersPO::getLocation),
+					columnOf(EsOffersPO::getGeoPoint),
 					req.getLat().doubleValue(), req.getLng().doubleValue());
 			disSortBuilder.order(SortOrder.ASC);
 			disSortBuilder.unit(DistanceUnit.METERS);
