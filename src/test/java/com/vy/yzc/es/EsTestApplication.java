@@ -6,6 +6,7 @@ import com.vy.yzc.es.dal.repo.model.EsOffersPO;
 import com.vy.yzc.es.dto.EsOffersSaveReq;
 import com.vy.yzc.es.dto.EsSearchVO;
 import com.vy.yzc.es.dto.OffersNearReq;
+import com.vy.yzc.es.dto.OffersOfflineSearchReq;
 import com.vy.yzc.es.service.OffersElasticsearchService;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -36,6 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -52,17 +54,40 @@ public class EsTestApplication {
 	@Autowired
 	private OffersRepository offersRepository;
 
-//	@Test
-////	public void test(){
-////
-////		BoolQueryBuilder result = new BoolQueryBuilder();
-////		result.must(QueryBuilders.matchQuery("title", "运动"));
-////		Iterable<EsOffersPO> search = offersRepository.search(result, PageRequest.of(0,10));
-////
-////		Lists.newArrayList(search).forEach(System.out::println);
-//////		System.out.println(offersRepository.findById(1375070232629309470L));
-////	}
-////
+
+	@Test
+	public  void init(){
+		EsOffersPO build = EsOffersPO.builder()
+				.offersId(1234L)
+				.title("title")
+				.content("content")
+				.infoSource(1)
+				.postType(2)
+				.categoryType(1L)
+				.categoryName("name")
+				.location("31.231706,121.472644")
+				.shopName("shopName")
+				.discountPrice(0)
+				.price(0)
+				.validEndTime(System.currentTimeMillis())
+				.validStartTime(System.currentTimeMillis())
+				.deleted(0)
+				.build();
+		offersRepository.save(build);
+	}
+
+	@Test
+	public void testSearch(){
+
+		OffersOfflineSearchReq req = OffersOfflineSearchReq.builder()
+				.platform(1)
+				.lng(BigDecimal.valueOf(121.472644))
+				.lat(BigDecimal.valueOf(36.123))
+				.build();
+		EsSearchVO<Long> longEsSearchVO = offersElasticsearchService.searchOffline(req);
+		System.out.println(longEsSearchVO);
+	}
+
 
 
 	@Test
@@ -88,22 +113,6 @@ public class EsTestApplication {
 		offersElasticsearchService.updateDeletedState(offersIds,1);
 	}
 
-	@Test
-	public  void init(){
-		EsOffersPO build = EsOffersPO.builder()
-				.offersId(1234L)
-				.title("title")
-				.content("content")
-				.infoSource(1)
-				.postType(2)
-				.categoryType(1L)
-				.categoryName("name")
-				.location("31.231706,121.472644")
-				.shopName("shopName")
-				.deleted(0)
-				.build();
-		offersRepository.save(build);
-	}
 
 
 	@Test

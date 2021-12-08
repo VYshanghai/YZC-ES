@@ -71,7 +71,6 @@ public class EsOffersPO {
 	 * 英文逗号
 	 */
 	@GeoPointField
-	@Field(name = "location", type = FieldType.Auto)
 	private String location;
 
 	/**

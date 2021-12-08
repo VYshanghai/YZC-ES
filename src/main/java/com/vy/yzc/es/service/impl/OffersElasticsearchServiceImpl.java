@@ -259,7 +259,7 @@ public class OffersElasticsearchServiceImpl extends
 		BoolQueryBuilder result = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery(columnOf(EsOffersPO::getDeleted), 0));
 //		result.must(getTimeValidStartQuery());
-		result.must(getTimeValidEndQuery());
+//		result.must(getTimeValidEndQuery());
 		return result;
 	}
 
