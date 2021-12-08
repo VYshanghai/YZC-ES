@@ -95,12 +95,12 @@ public class EsTestApplication {
 				.title("title")
 				.content("content")
 				.infoSource(1)
-				.postType(1)
+				.postType(2)
 				.categoryType(1L)
 				.categoryName("name")
 				.location("31.231706,121.472644")
 				.shopName("shopName")
-				.deleted(1)
+				.deleted(0)
 				.build();
 		offersRepository.save(build);
 	}
