@@ -396,7 +396,7 @@ public class OffersElasticsearchServiceImpl extends
 				q -> getOfflineQuery(req),
 				getOfflineSortBuilder(req),
 				pos -> pos.stream()
-						.sorted(Comparator.comparing(EsOffersPO::getCreatedTime).reversed())
+//						.sorted(Comparator.comparing(EsOffersPO::getCreatedTime).reversed())
 						.map(EsOffersPO::getOffersId)
 						.collect(Collectors.toList()));
 		return page2VO(page);
