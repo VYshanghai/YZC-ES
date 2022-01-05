@@ -1,4 +1,5 @@
 es:
-  host: 172.17.188.12:9200
+#  host: 172.17.188.12:9200
+  host: 172.17.187.173:9200
   username: elastic
   password: WmaiVisva2018
